@@ -1,0 +1,5 @@
+uri,username,password,domain,ip_address,port,path,tags,title,is_resolved,is_accessible,has_login_form,login_form_type,web_application,is_parked,is_breached
+http://dKranQB7c5H2WKHJF5rygyRh5-vrf7ZVODNX_XoJgJ5YncxgwK7vbH1kZrYCLmv68MEawe5nFA-sfKQk9mrbFQ==@tv.twitch.android.app/,mosaab_41,PFLP1115,tv.twitch.android.app,,80,/,"['non-secured', 'unresolved']",,False,False,False,,,False,False
+https://com.bukalapak.android:8080/,fandiansyahajie103@gmail.com,fandiansyah2005,com.bukalapak.android,,8080,/,"['ssl-secured', 'unresolved']",,False,False,False,,,False,False
+http://trabalheagora.online/wp-admin/profile.php,https,Manuella16,trabalheagora.online,,80,/wp-admin/profile.php,"['non-secured', 'resolved', 'application-wordpress']",,True,False,False,,WordPress,False,False
+http://forum.xda-developers.com/one-m9/orig-development/rom-android-ice-cold-project-14-0-t3860594,vinhok,//fm-vn.com,forum.xda-developers.com,,80,/one-m9/orig-development/rom-android-ice-cold-project-14-0-t3860594,"['non-secured', 'resolved']",,True,False,False,,,False,False
