@@ -172,3 +172,37 @@
 2025-01-19 05:36:19,691 - werkzeug - INFO - 127.0.0.1 - - [19/Jan/2025 05:36:19] "GET /api/statistics HTTP/1.1" 200 -
 2025-01-19 05:36:22,401 - werkzeug - INFO - 127.0.0.1 - - [19/Jan/2025 05:36:22] "GET /api/statistics HTTP/1.1" 200 -
 2025-01-19 05:36:25,018 - werkzeug - INFO - 127.0.0.1 - - [19/Jan/2025 05:36:25] "GET /api/statistics HTTP/1.1" 200 -
+2025-01-19 09:29:36,825 - werkzeug - WARNING -  * Debugger is active!
+2025-01-19 09:29:36,829 - werkzeug - INFO -  * Debugger PIN: 540-887-385
+2025-01-19 09:29:39,674 - werkzeug - INFO - 127.0.0.1 - - [19/Jan/2025 09:29:39] "GET /api/statistics HTTP/1.1" 200 -
+2025-01-19 09:29:42,391 - werkzeug - INFO - 127.0.0.1 - - [19/Jan/2025 09:29:42] "GET /api/statistics HTTP/1.1" 200 -
+2025-01-19 09:29:45,248 - werkzeug - INFO - 127.0.0.1 - - [19/Jan/2025 09:29:45] "GET /api/statistics HTTP/1.1" 200 -
+2025-01-19 09:29:48,409 - werkzeug - INFO - 127.0.0.1 - - [19/Jan/2025 09:29:48] "GET /api/statistics HTTP/1.1" 200 -
+2025-01-19 09:32:11,163 - werkzeug - INFO - 127.0.0.1 - - [19/Jan/2025 09:32:11] "GET /api/statistics HTTP/1.1" 200 -
+2025-01-19 09:32:14,315 - werkzeug - INFO - 127.0.0.1 - - [19/Jan/2025 09:32:14] "GET /api/statistics HTTP/1.1" 200 -
+2025-01-19 09:32:17,382 - werkzeug - INFO - 127.0.0.1 - - [19/Jan/2025 09:32:17] "GET /api/statistics HTTP/1.1" 200 -
+2025-01-19 09:32:20,425 - werkzeug - INFO - 127.0.0.1 - - [19/Jan/2025 09:32:20] "GET /api/statistics HTTP/1.1" 200 -
+2025-01-19 09:32:43,204 - werkzeug - INFO - 127.0.0.1 - - [19/Jan/2025 09:32:43] "GET /api/search?q=tex HTTP/1.1" 200 -
+2025-01-19 09:32:43,734 - werkzeug - INFO - 127.0.0.1 - - [19/Jan/2025 09:32:43] "GET /api/search?q=test HTTP/1.1" 200 -
+2025-01-19 09:32:50,883 - werkzeug - INFO - 127.0.0.1 - - [19/Jan/2025 09:32:50] "GET /api/search?q= HTTP/1.1" 200 -
+2025-01-19 09:36:25,398 - werkzeug - INFO - 127.0.0.1 - - [19/Jan/2025 09:36:25] "GET /api/statistics HTTP/1.1" 200 -
+2025-01-19 09:36:28,108 - werkzeug - INFO - 127.0.0.1 - - [19/Jan/2025 09:36:28] "GET /api/statistics HTTP/1.1" 200 -
+2025-01-19 09:36:39,046 - werkzeug - INFO - 127.0.0.1 - - [19/Jan/2025 09:36:39] "GET /api/statistics HTTP/1.1" 200 -
+2025-01-19 09:36:41,836 - werkzeug - INFO - 127.0.0.1 - - [19/Jan/2025 09:36:41] "GET /api/statistics HTTP/1.1" 200 -
+2025-01-19 09:36:44,591 - werkzeug - INFO - 127.0.0.1 - - [19/Jan/2025 09:36:44] "GET /api/statistics HTTP/1.1" 200 -
+2025-01-19 09:36:47,386 - werkzeug - INFO - 127.0.0.1 - - [19/Jan/2025 09:36:47] "GET /api/statistics HTTP/1.1" 200 -
+2025-01-19 09:36:50,421 - werkzeug - INFO - 127.0.0.1 - - [19/Jan/2025 09:36:50] "GET /api/statistics HTTP/1.1" 200 -
+2025-01-19 09:36:53,058 - werkzeug - INFO - 127.0.0.1 - - [19/Jan/2025 09:36:53] "GET /api/statistics HTTP/1.1" 200 -
+2025-01-19 09:37:07,723 - werkzeug - INFO - 127.0.0.1 - - [19/Jan/2025 09:37:07] "GET /api/statistics HTTP/1.1" 200 -
+2025-01-19 09:37:10,523 - werkzeug - INFO - 127.0.0.1 - - [19/Jan/2025 09:37:10] "GET /api/statistics HTTP/1.1" 200 -
+2025-01-19 09:37:14,325 - werkzeug - INFO - 127.0.0.1 - - [19/Jan/2025 09:37:14] "GET /api/statistics HTTP/1.1" 200 -
+2025-01-19 09:37:17,170 - werkzeug - INFO - 127.0.0.1 - - [19/Jan/2025 09:37:17] "GET /api/statistics HTTP/1.1" 200 -
+2025-01-19 09:37:21,102 - werkzeug - INFO - 127.0.0.1 - - [19/Jan/2025 09:37:21] "GET /api/statistics HTTP/1.1" 200 -
+2025-01-19 09:37:23,816 - werkzeug - INFO - 127.0.0.1 - - [19/Jan/2025 09:37:23] "GET /api/statistics HTTP/1.1" 200 -
+2025-01-19 09:37:25,237 - werkzeug - INFO - 127.0.0.1 - - [19/Jan/2025 09:37:25] "GET /api/statistics HTTP/1.1" 200 -
+2025-01-19 09:37:27,942 - werkzeug - INFO - 127.0.0.1 - - [19/Jan/2025 09:37:27] "GET /api/statistics HTTP/1.1" 200 -
+2025-01-19 09:37:57,332 - werkzeug - INFO - 127.0.0.1 - - [19/Jan/2025 09:37:57] "GET /api/statistics HTTP/1.1" 200 -
+2025-01-19 09:38:00,159 - werkzeug - INFO - 127.0.0.1 - - [19/Jan/2025 09:38:00] "GET /api/statistics HTTP/1.1" 200 -
+2025-01-19 09:47:37,732 - werkzeug - INFO - 127.0.0.1 - - [19/Jan/2025 09:47:37] "GET /api/search?q=twitch HTTP/1.1" 200 -
+2025-01-19 09:48:00,258 - werkzeug - INFO - 127.0.0.1 - - [19/Jan/2025 09:48:00] "GET /api/search?q=twitch&tag_scope=public HTTP/1.1" 200 -
+2025-01-19 09:48:09,996 - werkzeug - INFO - 127.0.0.1 - - [19/Jan/2025 09:48:09] "GET /api/search?q=twitch HTTP/1.1" 200 -
