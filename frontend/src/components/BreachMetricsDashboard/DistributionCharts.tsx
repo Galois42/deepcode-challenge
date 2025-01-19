@@ -91,74 +91,7 @@ const DistributionCharts: React.FC<DistributionChartsProps> = ({
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      {/* Authentication Methods Chart */}
-      <Card className="bg-gray-800 border border-blue-500/30 shadow-lg shadow-blue-500/20">
-        <CardHeader>
-          <CardTitle className="text-blue-400 flex items-center gap-2">
-            <Lock className="h-5 w-5" />
-            Authentication Methods
-          </CardTitle>
-          <CardDescription className="text-gray-400">
-            Distribution of login form types across detected services
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="h-[400px] relative">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <defs>
-                  {BLUE_SHADES.map((color, index) => (
-                    <linearGradient
-                      key={`gradient-${index}`}
-                      id={`auth-gradient-${index}`}
-                      x1="0" y1="0" x2="0" y2="1"
-                    >
-                      <stop offset="0%" stopColor={color} stopOpacity={0.9} />
-                      <stop offset="100%" stopColor={color} stopOpacity={0.6} />
-                    </linearGradient>
-                  ))}
-                </defs>
-                <Pie
-                  data={authData}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={80}
-                  outerRadius={140}
-                  paddingAngle={4}
-                  dataKey="value"
-                  startAngle={90}
-                  endAngle={-270}
-                >
-                  {authData.map((entry, index) => (
-                    <Cell
-                      key={`cell-${index}`}
-                      fill={`url(#auth-gradient-${index})`}
-                      stroke={BLUE_SHADES[index % BLUE_SHADES.length]}
-                      strokeWidth={2}
-                      className="transition-opacity duration-200 hover:opacity-80"
-                    />
-                  ))}
-                </Pie>
-                <Tooltip content={<CustomPieTooltip />} />
-                <Legend 
-                  formatter={(value) => <span className="text-blue-300 text-sm">{value}</span>}
-                />
-              </PieChart>
-            </ResponsiveContainer>
-
-            {/* Center statistics */}
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-              <div className="text-center">
-                <div className="text-3xl font-bold text-blue-400">
-                  {authTotal.toLocaleString()}
-                </div>
-                <div className="text-sm text-gray-400">Total Forms</div>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+    <div className="grid grid-cols-1 gap-6">
 
       {/* Applications Distribution Chart */}
       <Card className="bg-gray-800 border border-blue-500/30 shadow-lg shadow-blue-500/20">

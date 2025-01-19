@@ -6,10 +6,7 @@ import SummaryCards from "./SummaryCards";
 import SecurityRadarChart from "./SecurityRadarChart";
 import TimelineChart from "./TimelineChart";
 import DistributionCharts from "./DistributionCharts";
-import {
-  RiskSeverityChart,
-  AuthSuccessChart,
-} from "./CriticalCharts";
+import { RiskSeverityChart, AuthSuccessChart } from "./CriticalCharts";
 import type {
   SecurityMetrics,
   APIStatisticsResponse,
@@ -96,7 +93,9 @@ const BreachMetricsDashboard: React.FC = () => {
     generateHistoricalData(mockMetrics.total, mockMetrics.resolved)
   );
   const [authData, setAuthData] = useState<AuthPatternData[]>(
-    generateAuthData(generateHistoricalData(mockMetrics.total, mockMetrics.resolved))
+    generateAuthData(
+      generateHistoricalData(mockMetrics.total, mockMetrics.resolved)
+    )
   );
 
   const fetchData = useCallback(async () => {
@@ -235,13 +234,9 @@ const BreachMetricsDashboard: React.FC = () => {
               </div>
 
               {/* Middle Row - Key Insights */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <SecurityRadarChart data={metrics} />
+              <div className="grid grid-cols-1 gap-6">
                 <TimelineChart data={historicalData} />
-              </div>
-
-              {/* Bottom Row - Distribution Analysis */}
-              <div className="col-span-full">
+                <div className="col-span-1/2">
                 <DistributionCharts
                   loginFormData={{
                     basic: metrics.loginForms * 0.4,
@@ -250,14 +245,27 @@ const BreachMetricsDashboard: React.FC = () => {
                     other: metrics.loginForms * 0.1,
                   }}
                   applicationData={[
-                    { name: "WordPress", count: Math.round(metrics.total * 0.25) },
+                    {
+                      name: "WordPress",
+                      count: Math.round(metrics.total * 0.25),
+                    },
                     { name: "Citrix", count: Math.round(metrics.total * 0.2) },
-                    { name: "Exchange", count: Math.round(metrics.total * 0.15) },
-                    { name: "SharePoint", count: Math.round(metrics.total * 0.1) },
+                    {
+                      name: "Exchange",
+                      count: Math.round(metrics.total * 0.15),
+                    },
+                    {
+                      name: "SharePoint",
+                      count: Math.round(metrics.total * 0.1),
+                    },
                     { name: "Custom", count: Math.round(metrics.total * 0.3) },
                   ]}
                 />
               </div>
+              </div>
+
+              {/* Bottom Row - Distribution Analysis */}
+              
             </section>
           </div>
         )}
