@@ -50,11 +50,23 @@ const SecurityRadarChart: React.FC<SecurityRadarChartProps> = ({ data }) => {
     }
   ];
 
+  const CustomTooltip = ({ active, payload }: any) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="bg-gray-800 border border-blue-500/30 p-3 rounded-lg shadow-lg">
+          <p className="text-blue-400 font-medium mb-1">{payload[0].payload.category}</p>
+          <p className="text-white font-bold">{payload[0].value} instances</p>
+        </div>
+      );
+    }
+    return null;
+  };
+
   return (
-    <Card>
+    <Card className="bg-gray-800 border border-blue-500/30">
       <CardHeader>
-        <CardTitle>Security Risk Distribution</CardTitle>
-        <CardDescription>
+        <CardTitle className="text-blue-400">Security Risk Distribution</CardTitle>
+        <CardDescription className="text-gray-400">
           Comprehensive view of security metrics across different categories
         </CardDescription>
       </CardHeader>
@@ -62,18 +74,39 @@ const SecurityRadarChart: React.FC<SecurityRadarChartProps> = ({ data }) => {
         <div className="h-80">
           <ResponsiveContainer width="100%" height="100%">
             <RadarChart cx="50%" cy="50%" outerRadius="80%" data={radarData}>
-              <PolarGrid />
-              <PolarAngleAxis dataKey="category" />
-              <PolarRadiusAxis domain={[0, data.total]} />
+              <PolarGrid 
+                stroke="rgba(96, 165, 250, 0.2)"
+                strokeDasharray="3 3"
+              />
+              <PolarAngleAxis
+                dataKey="category"
+                tick={{ fill: '#60A5FA', fontSize: 12 }}
+                stroke="rgba(96, 165, 250, 0.2)"
+              />
+              <PolarRadiusAxis
+                stroke="rgba(96, 165, 250, 0.2)"
+                tick={{ fill: '#60A5FA' }}
+                angle={30}
+              />
               <Radar
                 name="Security Metrics"
                 dataKey="value"
-                stroke="#8884d8"
-                fill="#8884d8"
-                fillOpacity={0.6}
+                stroke="#60A5FA"
+                fill="#60A5FA"
+                fillOpacity={0.3}
+                strokeWidth={2}
+                animationBegin={200}
+                animationDuration={800}
               />
-              <Tooltip />
-              <Legend />
+              <Tooltip content={<CustomTooltip />} />
+              <Legend
+                wrapperStyle={{
+                  paddingTop: '20px'
+                }}
+                formatter={(value) => (
+                  <span className="text-blue-400">{value}</span>
+                )}
+              />
             </RadarChart>
           </ResponsiveContainer>
         </div>

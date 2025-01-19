@@ -36,10 +36,10 @@ const CyberHeader: React.FC<CyberHeaderProps> = ({ activeTab, onTabChange }) => 
           <div className="flex items-center space-x-2">
             <Shield className="w-8 h-8 text-blue-400 animate-pulse" />
             <div className="relative">
-              <h1 className="text-2xl font-bold text-blue-400">
+                <h1 className="text-2xl font-bold text-pink-500 [text-shadow:_-1px_-1px_0_#000,_1px_-1px_0_#000,_-1px_1px_0_#000,_1px_1px_0_#000]">
                 Breach Monitor
                 <span className="absolute -inset-1 bg-blue-400 opacity-20 blur" />
-              </h1>
+                </h1>
               <div className="text-xs text-blue-300 animate-pulse">
                 SYSTEM ACTIVE
               </div>

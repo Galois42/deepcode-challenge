@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Search, BarChart3 } from "lucide-react";
 import BreachMetricsDashboard from "@/components/BreachMetricsDashboard/BreachMetricsDashboard";
-import AdvancedSearch from "@/components/BreachMetricsDashboard/AdvancedSearch";
+import AdvancedSearch from "@/components/BreachMetricsDashboard/AdvancedSearch/AdvancedSearch";
 
 const BreachMonitor = () => {
   const [activeTab, setActiveTab] = useState("dashboard");

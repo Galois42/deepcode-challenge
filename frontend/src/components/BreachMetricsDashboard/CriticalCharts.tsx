@@ -1,27 +1,11 @@
 import React from "react";
 import {
-  PieChart,
-  Pie,
-  AreaChart,
-  Area,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-  Cell,
-  ComposedChart,
-  Line,
+  PieChart, Pie, AreaChart, Area, BarChart, Bar,
+  XAxis, YAxis, CartesianGrid, Tooltip, Legend,
+  ResponsiveContainer, Cell, ComposedChart, Line,
 } from "recharts";
 import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
+  Card, CardContent, CardHeader, CardTitle, CardDescription,
 } from "@/components/ui/card";
 import type {
   RiskSeverityData,
@@ -29,31 +13,29 @@ import type {
   HistoricalImpactData,
   AuthPatternData,
 } from "@/types/dashboard";
+import {
+  CHART_COLORS,
+  STATUS_COLORS,
+  SEQUENTIAL_COLORS,
+  CHART_CONFIG,
+  CHART_THEME,
+  getColorWithOpacity,
+  COLOR_WITH_OPACITY,
+  AREA_GRADIENTS
+} from '../../types/chartColors';
 
 interface ChartProps<T> {
   data: T[];
 }
 
-const COLORS = ["#FF4560", "#FF8C00", "#FFC000", "#00E396"];
-const BG_COLORS = [
-  "rgba(255, 69, 96, 0.2)",
-  "rgba(255, 140, 0, 0.2)",
-  "rgba(255, 192, 0, 0.2)",
-  "rgba(0, 227, 150, 0.2)",
-];
-
 // Risk Severity Distribution
 export const RiskSeverityChart: React.FC<ChartProps<RiskSeverityData>> = ({
   data,
 }) => {
-  const COLORS = ["#dc2626", "#ea580c", "#d97706", "#65a30d"];
-
   return (
     <Card className="bg-gray-800 border border-blue-500/30 shadow-md shadow-blue-500/20">
       <CardHeader>
-        <CardTitle className="text-blue-400">
-          Risk Severity Distribution
-        </CardTitle>
+        <CardTitle className="text-blue-400">Risk Severity Distribution</CardTitle>
         <CardDescription className="text-gray-400">
           Overview of breach severity levels
         </CardDescription>
@@ -68,7 +50,7 @@ export const RiskSeverityChart: React.FC<ChartProps<RiskSeverityData>> = ({
                 cy="50%"
                 innerRadius={70}
                 outerRadius={100}
-                fill="#8884d8"
+                fill={CHART_COLORS.primary}
                 dataKey="count"
                 label={({ name, percent }) =>
                   `${name} (${(percent * 100).toFixed(0)}%)`
@@ -78,43 +60,23 @@ export const RiskSeverityChart: React.FC<ChartProps<RiskSeverityData>> = ({
                 {data.map((_, index) => (
                   <Cell
                     key={`cell-${index}`}
-                    fill={COLORS[index % COLORS.length]}
-                    stroke={BG_COLORS[index % BG_COLORS.length]}
+                    fill={SEQUENTIAL_COLORS[index % SEQUENTIAL_COLORS.length]}
+                    stroke={CHART_THEME.primary.border}
                     strokeWidth={2}
                   />
                 ))}
               </Pie>
               <Tooltip
-                contentStyle={{
-                  backgroundColor: "#0A0F1A",
-                  borderColor: COLORS[0],
-                  color: "#FFF",
-                  boxShadow: "0 0 10px rgba(255, 69, 96, 0.5)",
-                }}
+                contentStyle={CHART_CONFIG.tooltip}
               />
               <Legend
-                wrapperStyle={{
-                  paddingTop: "10px",
-                }}
-                formatter={(value, _) => (
-                  <span className="text-white text-sm font-medium">
-                    {value}
-                  </span>
+                wrapperStyle={{ paddingTop: "10px" }}
+                formatter={(value) => (
+                  <span className="text-blue-400 text-sm font-medium">{value}</span>
                 )}
               />
             </PieChart>
           </ResponsiveContainer>
-
-          {/* Animated glow */}
-          <div
-            className="absolute inset-0 rounded-full"
-            style={{
-              background:
-                "radial-gradient(circle, rgba(255, 69, 96, 0.4) 0%, rgba(255, 69, 96, 0) 70%)",
-              zIndex: 0,
-              animation: "pulseGlow 3s infinite",
-            }}
-          />
         </div>
       </CardContent>
     </Card>
@@ -122,26 +84,24 @@ export const RiskSeverityChart: React.FC<ChartProps<RiskSeverityData>> = ({
 };
 
 // Breach Resolution Status
-export const BreachResolutionChart: React.FC<
-  ChartProps<BreachResolutionData>
-> = ({ data }) => {
-  // Enhanced color scheme for cyber theme
+export const BreachResolutionChart: React.FC<ChartProps<BreachResolutionData>> = ({
+  data,
+}) => {
   const getBarColor = (category: string) => {
     switch (category) {
       case "Resolved":
-        return "#22c55e"; // Success green
+        return STATUS_COLORS.resolved;
       case "In Progress":
-        return "#3b82f6"; // Processing blue
+        return STATUS_COLORS.active;
       case "Pending":
-        return "#f59e0b"; // Warning amber
+        return STATUS_COLORS.pending;
       case "Requires Attention":
-        return "#ef4444"; // Critical red
+        return STATUS_COLORS.critical;
       default:
-        return "#60A5FA"; // Default blue
+        return CHART_COLORS.primary;
     }
   };
 
-  // Custom tooltip component
   const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
@@ -153,7 +113,7 @@ export const BreachResolutionChart: React.FC<
               className="w-3 h-3 rounded-full"
               style={{ backgroundColor: getBarColor(data.category) }}
             />
-            <p className="text-white font-bold">{data.count} breaches</p>
+            <p className="text-blue-300 font-bold">{data.count} breaches</p>
           </div>
         </div>
       );
@@ -164,9 +124,7 @@ export const BreachResolutionChart: React.FC<
   return (
     <Card className="bg-gray-800 border-blue-500/30">
       <CardHeader>
-        <CardTitle className="text-blue-400">
-          Breach Resolution Progress
-        </CardTitle>
+        <CardTitle className="text-blue-400">Breach Resolution Progress</CardTitle>
         <CardDescription className="text-gray-400">
           Current status of identified security breaches
         </CardDescription>
@@ -179,29 +137,15 @@ export const BreachResolutionChart: React.FC<
               layout="vertical"
               margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
             >
-              <CartesianGrid
-                strokeDasharray="3 3"
-                stroke="rgba(96, 165, 250, 0.1)"
-                horizontal={false}
-              />
-              <XAxis
-                type="number"
-                stroke="#60A5FA"
-                tick={{ fill: "#60A5FA" }}
-                tickLine={{ stroke: "#60A5FA" }}
-              />
+              <CartesianGrid {...CHART_CONFIG.grid} horizontal={false} />
+              <XAxis {...CHART_CONFIG.axis} type="number" />
               <YAxis
+                {...CHART_CONFIG.axis}
                 dataKey="category"
                 type="category"
                 width={120}
-                stroke="#60A5FA"
-                tick={{ fill: "#60A5FA" }}
-                tickLine={{ stroke: "#60A5FA" }}
               />
-              <Tooltip
-                content={<CustomTooltip />}
-                cursor={{ fill: "rgba(96, 165, 250, 0.1)" }}
-              />
+              <Tooltip content={<CustomTooltip />} />
               <Bar
                 dataKey="count"
                 radius={[0, 4, 4, 0]}
@@ -211,7 +155,7 @@ export const BreachResolutionChart: React.FC<
                   <Cell
                     key={`cell-${index}`}
                     fill={getBarColor(entry.category)}
-                    fillOpacity={0.8}
+                    fillOpacity={COLOR_WITH_OPACITY.active}
                     className="hover:fill-opacity-100 transition-opacity duration-300"
                   />
                 ))}
@@ -225,15 +169,13 @@ export const BreachResolutionChart: React.FC<
 };
 
 // Historical Breach Impact
-export const HistoricalImpactChart: React.FC<
-  ChartProps<HistoricalImpactData>
-> = ({ data }) => {
+export const HistoricalImpactChart: React.FC<ChartProps<HistoricalImpactData>> = ({
+  data,
+}) => {
   return (
     <Card className="bg-gray-800 border border-blue-500/30 shadow-md shadow-blue-500/20">
       <CardHeader>
-        <CardTitle className="text-blue-400">
-          Historical Breach Impact
-        </CardTitle>
+        <CardTitle className="text-blue-400">Historical Breach Impact</CardTitle>
         <CardDescription className="text-gray-400">
           Trend analysis of breach impacts over time
         </CardDescription>
@@ -243,119 +185,85 @@ export const HistoricalImpactChart: React.FC<
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={data}>
               <defs>
-                <linearGradient
-                  id="accountsGradient"
-                  x1="0"
-                  y1="0"
-                  x2="0"
-                  y2="1"
-                >
-                  <stop offset="5%" stopColor="#8884d8" stopOpacity={0.8} />
-                  <stop offset="95%" stopColor="#8884d8" stopOpacity={0} />
-                </linearGradient>
-                <linearGradient
-                  id="systemsGradient"
-                  x1="0"
-                  y1="0"
-                  x2="0"
-                  y2="1"
-                >
-                  <stop offset="5%" stopColor="#82ca9d" stopOpacity={0.8} />
-                  <stop offset="95%" stopColor="#82ca9d" stopOpacity={0} />
-                </linearGradient>
-                <linearGradient
-                  id="recoveryGradient"
-                  x1="0"
-                  y1="0"
-                  x2="0"
-                  y2="1"
-                >
-                  <stop offset="5%" stopColor="#ffc658" stopOpacity={0.8} />
-                  <stop offset="95%" stopColor="#ffc658" stopOpacity={0} />
-                </linearGradient>
+                {Object.entries(AREA_GRADIENTS).map(([key, gradient]) => (
+                  <linearGradient
+                    key={gradient.id}
+                    id={gradient.id}
+                    x1="0"
+                    y1="0"
+                    x2="0"
+                    y2="1"
+                  >
+                    <stop
+                      offset="5%"
+                      stopColor={gradient.color}
+                      stopOpacity={gradient.opacity.start}
+                    />
+                    <stop
+                      offset="95%"
+                      stopColor={gradient.color}
+                      stopOpacity={gradient.opacity.end}
+                    />
+                  </linearGradient>
+                ))}
               </defs>
-              <CartesianGrid
-                strokeDasharray="3 3"
-                stroke="rgba(255, 255, 255, 0.1)"
-              />
-              <XAxis dataKey="date" stroke="#FFF" />
-              <YAxis stroke="#FFF" />
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: "#0A0F1A",
-                  borderColor: "#8884d8",
-                  color: "#FFF",
-                  boxShadow: "0 0 10px rgba(136, 132, 216, 0.5)",
-                }}
-              />
+              <CartesianGrid {...CHART_CONFIG.grid} />
+              <XAxis {...CHART_CONFIG.axis} dataKey="date" />
+              <YAxis {...CHART_CONFIG.axis} />
+              <Tooltip contentStyle={CHART_CONFIG.tooltip} />
               <Legend
-                wrapperStyle={{
-                  paddingTop: "10px",
-                }}
-                formatter={(value, _) => (
-                  <span className="text-white text-sm font-medium">
-                    {value}
-                  </span>
+                wrapperStyle={{ paddingTop: "10px" }}
+                formatter={(value) => (
+                  <span className="text-blue-400 text-sm font-medium">{value}</span>
                 )}
               />
               <Area
                 type="monotone"
                 dataKey="accountsAffected"
-                stroke="#8884d8"
+                stroke={CHART_COLORS.primary}
                 strokeWidth={2}
                 fillOpacity={1}
-                fill="url(#accountsGradient)"
+                fill={`url(#${AREA_GRADIENTS.primary.id})`}
                 name="Accounts Affected"
                 activeDot={{
                   r: 5,
-                  fill: "#8884d8",
-                  stroke: "#8884d8",
+                  fill: CHART_COLORS.primary,
+                  stroke: CHART_COLORS.primary,
                   strokeWidth: 2,
                 }}
               />
               <Area
                 type="monotone"
                 dataKey="criticalSystems"
-                stroke="#82ca9d"
+                stroke={CHART_COLORS.secondary}
                 strokeWidth={2}
                 fillOpacity={1}
-                fill="url(#systemsGradient)"
+                fill={`url(#${AREA_GRADIENTS.secondary.id})`}
                 name="Critical Systems"
                 activeDot={{
                   r: 5,
-                  fill: "#82ca9d",
-                  stroke: "#82ca9d",
+                  fill: CHART_COLORS.secondary,
+                  stroke: CHART_COLORS.secondary,
                   strokeWidth: 2,
                 }}
               />
               <Area
                 type="monotone"
                 dataKey="recoveryTime"
-                stroke="#ffc658"
+                stroke={CHART_COLORS.tertiary}
                 strokeWidth={2}
                 fillOpacity={1}
-                fill="url(#recoveryGradient)"
+                fill={`url(#${AREA_GRADIENTS.tertiary.id})`}
                 name="Recovery Time (hrs)"
                 activeDot={{
                   r: 5,
-                  fill: "#ffc658",
-                  stroke: "#ffc658",
+                  fill: CHART_COLORS.tertiary,
+                  stroke: CHART_COLORS.tertiary,
                   strokeWidth: 2,
                 }}
               />
             </AreaChart>
           </ResponsiveContainer>
-
-          {/* Animated glow */}
-          <div
-            className="absolute inset-0"
-            style={{
-              background:
-                "radial-gradient(circle, rgba(136, 132, 216, 0.3) 0%, rgba(136, 132, 216, 0) 70%)",
-              zIndex: 0,
-              animation: "pulseGlow 3s infinite",
-            }}
-          />
         </div>
       </CardContent>
     </Card>
@@ -377,7 +285,7 @@ export const AuthSuccessChart: React.FC<ChartProps<AuthPatternData>> = ({
                 className="w-2 h-2 rounded-full"
                 style={{ backgroundColor: entry.color }}
               />
-              <span className="text-gray-300">
+              <span className="text-blue-300">
                 {entry.name}:
                 <span className="font-bold ml-1">
                   {entry.name === "Success Rate %"
@@ -405,40 +313,29 @@ export const AuthSuccessChart: React.FC<ChartProps<AuthPatternData>> = ({
         <div className="h-80">
           <ResponsiveContainer width="100%" height="100%">
             <ComposedChart data={data}>
-              <CartesianGrid
-                strokeDasharray="3 3"
-                stroke="rgba(96, 165, 250, 0.1)"
-                vertical={false}
-              />
-              <XAxis
-                dataKey="date"
-                stroke="#60A5FA"
-                tick={{ fill: "#60A5FA" }}
-                tickLine={{ stroke: "#60A5FA" }}
-              />
+              <CartesianGrid {...CHART_CONFIG.grid} vertical={false} />
+              <XAxis {...CHART_CONFIG.axis} dataKey="date" />
               <YAxis
+                {...CHART_CONFIG.axis}
                 yAxisId="left"
-                stroke="#60A5FA"
-                tick={{ fill: "#60A5FA" }}
-                tickLine={{ stroke: "#60A5FA" }}
                 label={{
                   value: "Auth Attempts",
                   angle: -90,
                   position: "insideLeft",
-                  fill: "#60A5FA",
+                  fill: CHART_COLORS.primary,
                 }}
               />
               <YAxis
                 yAxisId="right"
                 orientation="right"
-                stroke="#22c55e"
-                tick={{ fill: "#22c55e" }}
-                tickLine={{ stroke: "#22c55e" }}
+                stroke={CHART_COLORS.secondary}
+                tick={{ fill: CHART_COLORS.secondary }}
+                tickLine={{ stroke: CHART_COLORS.secondary }}
                 label={{
                   value: "Success Rate %",
                   angle: 90,
                   position: "insideRight",
-                  fill: "#22c55e",
+                  fill: CHART_COLORS.secondary,
                 }}
               />
               <Tooltip content={<CustomTooltip />} />
@@ -451,8 +348,8 @@ export const AuthSuccessChart: React.FC<ChartProps<AuthPatternData>> = ({
               <Bar
                 yAxisId="left"
                 dataKey="attempts"
-                fill="#3b82f6"
-                fillOpacity={0.8}
+                fill={CHART_COLORS.primary}
+                fillOpacity={COLOR_WITH_OPACITY.active}
                 radius={[4, 4, 0, 0]}
                 name="Auth Attempts"
                 className="hover:fill-opacity-100 transition-opacity duration-300"
@@ -461,18 +358,18 @@ export const AuthSuccessChart: React.FC<ChartProps<AuthPatternData>> = ({
                 yAxisId="right"
                 type="monotone"
                 dataKey="successRate"
-                stroke="#22c55e"
+                stroke={CHART_COLORS.secondary}
                 strokeWidth={2}
                 dot={{
                   r: 4,
-                  fill: "#22c55e",
-                  stroke: "#22c55e",
+                  fill: CHART_COLORS.secondary,
+                  stroke: CHART_COLORS.secondary,
                 }}
                 activeDot={{
                   r: 6,
-                  stroke: "#22c55e",
+                  stroke: CHART_COLORS.secondary,
                   strokeWidth: 2,
-                  fill: "#22c55e",
+                  fill: CHART_COLORS.secondary,
                 }}
                 name="Success Rate %"
               />

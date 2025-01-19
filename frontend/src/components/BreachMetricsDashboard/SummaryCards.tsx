@@ -1,13 +1,18 @@
 import React, { useEffect, useState } from 'react';
-import { Shield, AlertTriangle, CheckCircle, History } from 'lucide-react';
+import { Shield, AlertTriangle, CheckCircle, Lock } from 'lucide-react';
 import type { SecurityMetrics } from '@/types/dashboard';
 
 interface AnimatedCounterProps {
   value: number;
   duration?: number;
+  formatter?: (value: number) => string;
 }
 
-const AnimatedCounter: React.FC<AnimatedCounterProps> = ({ value, duration = 2000 }) => {
+const AnimatedCounter: React.FC<AnimatedCounterProps> = ({ 
+  value, 
+  duration = 2000,
+  formatter = (val) => val.toLocaleString()
+}) => {
   const [count, setCount] = useState(0);
 
   useEffect(() => {
@@ -30,7 +35,7 @@ const AnimatedCounter: React.FC<AnimatedCounterProps> = ({ value, duration = 200
     return () => cancelAnimationFrame(animationFrame);
   }, [value, duration]);
 
-  return <span>{count.toLocaleString()}</span>;
+  return <span>{formatter(count)}</span>;
 };
 
 interface SummaryCardsProps {
@@ -44,99 +49,76 @@ const SummaryCards: React.FC<SummaryCardsProps> = ({ metrics }) => {
       value: metrics.total,
       icon: Shield,
       color: "blue",
-      pulseColor: "rgba(96, 165, 250, 0.5)",
     },
     {
-      title: "Unresolved Breaches",
+      title: "Active Threats",
       value: metrics.unresolved,
       icon: AlertTriangle,
       color: "red",
-      pulseColor: "rgba(239, 68, 68, 0.5)",
       critical: true,
     },
     {
-      title: "Resolved Issues",
+      title: "Secured Systems",
       value: metrics.resolved,
       icon: CheckCircle,
-      color: "green",
-      pulseColor: "rgba(34, 197, 94, 0.5)",
+      color: "blue",
     },
     {
-      title: "Previously Breached",
-      value: metrics.previouslyBreached,
-      icon: History,
-      color: "yellow",
-      pulseColor: "rgba(234, 179, 8, 0.5)",
+      title: "Protected Services",
+      value: metrics.loginForms,
+      icon: Lock,
+      color: "blue",
     },
   ];
 
   return (
-    <div className="grid grid-cols-4 gap-4">
+    <div className="flex flex-nowrap gap-4 w-full overflow-x-auto my-2">
       {cards.map((card) => (
         <div
           key={card.title}
           className={`
-            relative overflow-hidden
-            bg-gray-800 rounded-lg border p-4
-            ${card.color === 'blue' && 'border-blue-500/30'}
-            ${card.color === 'red' && 'border-red-500/30'}
-            ${card.color === 'green' && 'border-green-500/30'}
-            ${card.color === 'yellow' && 'border-yellow-500/30'}
+            relative flex-1 min-w-[250px]
+            bg-gray-800 rounded-lg border p-6
+            ${card.critical 
+              ? 'border-cyan-400 shadow-lg shadow-cyan-500/50 animate-pulseGlow' 
+              : `border-${card.color}-500/30`}
+            transition-all duration-300
+            hover:scale-105
           `}
         >
-          <div className="flex flex-col">
-            <div className="flex items-center justify-between">
-              <card.icon 
-                className={`
-                  w-4 h-4
-                  ${card.color === 'blue' && 'text-blue-400'}
-                  ${card.color === 'red' && 'text-red-400'}
-                  ${card.color === 'green' && 'text-green-400'}
-                  ${card.color === 'yellow' && 'text-yellow-400'}
-                `} 
-              />
-              <h3 className={`
-                text-xs font-medium
-                ${card.color === 'blue' && 'text-blue-400'}
-                ${card.color === 'red' && 'text-red-400'}
-                ${card.color === 'green' && 'text-green-400'}
-                ${card.color === 'yellow' && 'text-yellow-400'}
-              `}>
+          {/* Background Gradient */}
+          <div
+            className={`
+              absolute inset-0 opacity-20 rounded-lg
+              bg-gradient-to-br from-${card.color}-600/20 to-${card.color}-400/20
+            `}
+          />
+
+          <div className="relative">
+            {/* Header */}
+            <div className="flex items-center justify-between mb-4">
+              <card.icon className={`w-5 h-5 text-${card.color}-400`} />
+              <h3 className={`text-sm font-medium text-${card.color}-400`}>
                 {card.title}
               </h3>
             </div>
-            
-            <div className={`
-              text-xl font-bold mt-2 text-center
-              ${card.color === 'blue' && 'text-blue-300'}
-              ${card.color === 'red' && 'text-red-300'}
-              ${card.color === 'green' && 'text-green-300'}
-              ${card.color === 'yellow' && 'text-yellow-300'}
-            `}>
+
+            {/* Value */}
+            <div className={`text-2xl font-bold text-${card.color}-400 text-center mb-2`}>
               <AnimatedCounter value={card.value} />
             </div>
 
-            {card.critical && (
-              <div 
-                className="absolute inset-0 animate-pulse"
-                style={{
-                  background: `radial-gradient(circle at center, ${card.pulseColor} 0%, transparent 70%)`
-                }}
-              />
-            )}
-            
+            {/* Subtitle */}
+            <div className="text-xs text-center text-blue-300 opacity-80">
+              Last 30 days
+            </div>
+          </div>
+
+          {/* Progress indicator */}
+          <div className="absolute bottom-0 left-0 h-1 w-full bg-gray-700">
             <div 
-              className="absolute inset-0 opacity-20"
-              style={{
-                background: `
-                  linear-gradient(90deg, 
-                    transparent 0%, 
-                    ${card.pulseColor} 50%,
-                    transparent 100%
-                  )
-                `,
-                animation: 'glow 2s linear infinite'
-              }}
+              className={`h-full bg-${card.color}-400/50 transition-all duration-1000`}
+              style={{ width: '60%' }}
             />
           </div>
         </div>

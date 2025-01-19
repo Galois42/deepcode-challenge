@@ -24,9 +24,10 @@ const URLStatusIndicators: React.FC<URLStatusProps> = ({
   isParked,
   wasBreached
 }) => {
+  // Only render indicators that have truthy values
   return (
     <div className="flex flex-wrap gap-2">
-      {/* Accessibility Status */}
+      {/* Accessibility Status - Always show as it's a boolean */}
       <Tooltip content={`Status Code: ${isAccessible ? '200' : 'Not accessible'}`}>
         <Badge 
           variant={isAccessible ? "default" : "secondary"}
@@ -37,9 +38,9 @@ const URLStatusIndicators: React.FC<URLStatusProps> = ({
         </Badge>
       </Tooltip>
 
-      {/* Login Form Status */}
-      {hasLoginForm && (
-        <Tooltip content={`Login type: ${loginType || 'Basic'}`}>
+      {/* Login Form Status - Only show if hasLoginForm is true */}
+      {hasLoginForm && loginType && (
+        <Tooltip content={`Login type: ${loginType}`}>
           <Badge 
             variant="outline" 
             className="flex items-center gap-1 text-blue-400 border-blue-400"
@@ -53,20 +54,22 @@ const URLStatusIndicators: React.FC<URLStatusProps> = ({
         </Tooltip>
       )}
 
-      {/* Application Type */}
-      {applicationName && (
+      {/* Application Type - Only show if applicationName exists and is not empty */}
+      {applicationName && applicationName.trim() !== '' && (
         <Badge variant="secondary" className="flex items-center gap-1 text-blue-400 bg-blue-500/10">
           <Shield className="h-3 w-3 text-blue-400" />
           {applicationName}
         </Badge>
       )}
 
-      {/* Parked Domain */}
+      {/* Parked Domain - Only show if isParked is true */}
       {isParked && (
-        <Badge variant="secondary" className="text-blue-400 bg-blue-500/10">Parked Domain</Badge>
+        <Badge variant="secondary" className="text-blue-400 bg-blue-500/10">
+          Parked Domain
+        </Badge>
       )}
 
-      {/* Previously Breached */}
+      {/* Previously Breached - Only show if wasBreached is true */}
       {wasBreached && (
         <Tooltip content="Domain previously involved in a breach">
           <Badge 
@@ -79,8 +82,8 @@ const URLStatusIndicators: React.FC<URLStatusProps> = ({
         </Tooltip>
       )}
 
-      {/* URL Title */}
-      {title && (
+      {/* URL Title - Only show if title exists and is not empty */}
+      {title && title.trim() !== '' && (
         <Tooltip content={title}>
           <Badge variant="outline" className="max-w-xs truncate text-blue-400 border-blue-400">
             {title}

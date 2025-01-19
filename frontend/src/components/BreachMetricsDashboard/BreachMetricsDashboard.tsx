@@ -8,8 +8,6 @@ import TimelineChart from "./TimelineChart";
 import DistributionCharts from "./DistributionCharts";
 import {
   RiskSeverityChart,
-  BreachResolutionChart,
-  HistoricalImpactChart,
   AuthSuccessChart,
 } from "./CriticalCharts";
 import type {
@@ -20,7 +18,7 @@ import type {
   HistoricalImpactData,
   AuthPatternData,
 } from "@/types/dashboard";
-import AdvancedSearch from "./AdvancedSearch";
+import AdvancedSearch from "./AdvancedSearch/AdvancedSearch";
 import axios from "axios";
 
 // Helper functions for mock data generation
@@ -87,7 +85,7 @@ const BreachMetricsDashboard: React.FC = () => {
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
   const [isMockData, setIsMockData] = useState<boolean>(true);
 
-  // Derived state for charts
+  // Chart state declarations remain the same...
   const [riskData, setRiskData] = useState<RiskSeverityData[]>(
     calculateRiskSeverity(mockMetrics.total)
   );
@@ -98,9 +96,7 @@ const BreachMetricsDashboard: React.FC = () => {
     generateHistoricalData(mockMetrics.total, mockMetrics.resolved)
   );
   const [authData, setAuthData] = useState<AuthPatternData[]>(
-    generateAuthData(
-      generateHistoricalData(mockMetrics.total, mockMetrics.resolved)
-    )
+    generateAuthData(generateHistoricalData(mockMetrics.total, mockMetrics.resolved))
   );
 
   const fetchData = useCallback(async () => {
@@ -178,75 +174,94 @@ const BreachMetricsDashboard: React.FC = () => {
   }, [fetchData]);
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold">Security Dashboard</h1>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={fetchData}
-          disabled={isRefreshing}
-          className="flex items-center gap-2"
-        >
-          <RefreshCw
-            className={`h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`}
-          />
-          {isRefreshing ? "Refreshing..." : "Refresh Data"}
-        </Button>
-      </div>
+    <div className="relative min-h-screen bg-gray-900">
+      {/* Subtle Grid Background */}
+      <div
+        className="fixed inset-0 w-full h-full opacity-5"
+        style={{
+          backgroundImage: `
+            linear-gradient(to right, #60A5FA 1px, transparent 1px),
+            linear-gradient(to bottom, #60A5FA 1px, transparent 1px)
+          `,
+          backgroundSize: "50px 50px",
+        }}
+      />
 
-      {error && (
-        <Alert variant="destructive">
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      )}
-
-      {/* Advanced Search */}
-      <AdvancedSearch />
-
-      {loading ? (
-        <div className="flex justify-center items-center h-96">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900" />
+      {/* Main Content */}
+      <div className="relative max-w-[1920px] mx-auto p-6 space-y-6">
+        {/* Header Section */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+          <h1 className="text-3xl font-bold text-blue-400 tracking-tight">
+            Security Dashboard
+          </h1>
+          <Button
+            variant="outline"
+            size="lg"
+            onClick={fetchData}
+            disabled={isRefreshing}
+            className="bg-blue-500/10 text-blue-400 border-blue-400/30 hover:bg-blue-500/20 hover:text-blue-300 transition-all duration-200"
+          >
+            <RefreshCw
+              className={`h-5 w-5 mr-2 ${isRefreshing ? "animate-spin" : ""}`}
+            />
+            {isRefreshing ? "Refreshing Data..." : "Refresh Dashboard"}
+          </Button>
         </div>
-      ) : (
-        <>
-          {/* Summary Cards */}
-          <SummaryCards metrics={metrics} />
 
-          {/* Main Charts Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <RiskSeverityChart data={riskData} />
-            <BreachResolutionChart data={resolutionData} />
-            <HistoricalImpactChart data={historicalData} />
-            <AuthSuccessChart data={authData} />
-            <SecurityRadarChart data={metrics} />
-            <TimelineChart data={historicalData} />
-            <div className="col-span-2">
-              <DistributionCharts
-                loginFormData={{
-                  basic: metrics.loginForms * 0.4,
-                  captcha: metrics.loginForms * 0.3,
-                  otp: metrics.loginForms * 0.2,
-                  other: metrics.loginForms * 0.1,
-                }}
-                applicationData={[
-                  {
-                    name: "WordPress",
-                    count: Math.round(metrics.total * 0.25),
-                  },
-                  { name: "Citrix", count: Math.round(metrics.total * 0.2) },
-                  { name: "Exchange", count: Math.round(metrics.total * 0.15) },
-                  {
-                    name: "SharePoint",
-                    count: Math.round(metrics.total * 0.1),
-                  },
-                  { name: "Custom", count: Math.round(metrics.total * 0.3) },
-                ]}
-              />
-            </div>
+        {/* Error Alert */}
+        {error && (
+          <Alert variant="destructive" className="mb-6">
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+
+        {loading ? (
+          <div className="flex justify-center items-center h-96">
+            <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-400 border-t-transparent" />
           </div>
-        </>
-      )}
+        ) : (
+          <div className="space-y-8">
+            {/* Top Row - Summary Cards */}
+            <section aria-label="Summary Statistics">
+              <SummaryCards metrics={metrics} />
+            </section>
+
+            {/* Charts Grid */}
+            <section aria-label="Analytics Charts" className="grid gap-6">
+              {/* Top Row - Critical Metrics */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <RiskSeverityChart data={riskData} />
+                <AuthSuccessChart data={authData} />
+              </div>
+
+              {/* Middle Row - Key Insights */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <SecurityRadarChart data={metrics} />
+                <TimelineChart data={historicalData} />
+              </div>
+
+              {/* Bottom Row - Distribution Analysis */}
+              <div className="col-span-full">
+                <DistributionCharts
+                  loginFormData={{
+                    basic: metrics.loginForms * 0.4,
+                    captcha: metrics.loginForms * 0.3,
+                    otp: metrics.loginForms * 0.2,
+                    other: metrics.loginForms * 0.1,
+                  }}
+                  applicationData={[
+                    { name: "WordPress", count: Math.round(metrics.total * 0.25) },
+                    { name: "Citrix", count: Math.round(metrics.total * 0.2) },
+                    { name: "Exchange", count: Math.round(metrics.total * 0.15) },
+                    { name: "SharePoint", count: Math.round(metrics.total * 0.1) },
+                    { name: "Custom", count: Math.round(metrics.total * 0.3) },
+                  ]}
+                />
+              </div>
+            </section>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

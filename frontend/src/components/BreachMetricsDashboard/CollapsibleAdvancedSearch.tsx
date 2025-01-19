@@ -1,6 +1,6 @@
-import { useState } from 'react';
-import CollapsibleSearchSection from './CollapsibleSearchSection';
-import AdvancedSearch from './AdvancedSearch';
+import { useState } from "react";
+import CollapsibleSearchSection from "./CollapsibleSearchSection";
+import AdvancedSearch from "./AdvancedSearch/AdvancedSearch";
 
 const CollapsibleAdvancedSearch = () => {
   const [isOpen, setIsOpen] = useState(false);
