@@ -45,7 +45,7 @@ interface SearchResult {
   ip_address: string | null;
   port: number | null;
   path: string | null;
-  tags: string[];
+  tags: Record<string, string>;
   title: string | null;
   is_resolved: boolean;
   is_accessible: boolean;
@@ -98,12 +98,12 @@ const AdvancedSearch = () => {
         q: searchQuery,
         page: currentPage,
         per_page: 50,
-        ...activeFilters.reduce<Record<FilterType, string>>((acc, filter) => {
+        ...activeFilters.reduce((acc: Record<FilterType, string>, filter: SearchFilter) => {
           acc[filter.type] = filter.value;
           return acc;
         }, {} as Record<FilterType, string>),
       };
-
+  
       const response = await axios.get('/api/search', { params });
       setResults(response.data.results);
       setTotalResults(response.data.total);
@@ -301,14 +301,14 @@ const AdvancedSearch = () => {
                         </td>
                         <td className="px-4 py-3">
                           <div className="flex flex-wrap gap-1">
-                            {result.tags.map((tag, idx) => (
+                            {result.tags && Object.entries(result.tags).map(([key, value]) => (
                               <Badge
-                                key={idx}
+                                key={key}
                                 variant="outline"
                                 className="cursor-pointer hover:bg-gray-100"
-                                onClick={() => addFilter('tag', tag)}
+                                onClick={() => addFilter('tag', `${key}:${value}`)}
                               >
-                                {tag}
+                                {key}: {value}
                               </Badge>
                             ))}
                           </div>
