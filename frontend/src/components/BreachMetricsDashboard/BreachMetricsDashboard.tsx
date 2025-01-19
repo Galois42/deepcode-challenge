@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { RefreshCw } from "lucide-react";
@@ -6,123 +6,176 @@ import SummaryCards from "./SummaryCards";
 import SecurityRadarChart from "./SecurityRadarChart";
 import TimelineChart from "./TimelineChart";
 import DistributionCharts from "./DistributionCharts";
-import type { DashboardData } from "@/types/dashboard";
+import {
+  RiskSeverityChart,
+  BreachResolutionChart,
+  HistoricalImpactChart,
+  AuthSuccessChart,
+} from "./CriticalCharts";
+import type {
+  SecurityMetrics,
+  APIStatisticsResponse,
+  RiskSeverityData,
+  BreachResolutionData,
+  HistoricalImpactData,
+  AuthPatternData,
+} from "@/types/dashboard";
 import AdvancedSearch from "./AdvancedSearch";
 import axios from "axios";
 
-interface BreachMetricsDashboardProps {
-  apiEndpoint?: string;
-  onDataUpdate?: (data: DashboardData) => void;
-}
-
-const mockData: DashboardData = {
-  securityMetrics: {
-    total: 1500,
-    resolved: 600,
-    unresolved: 900,
-    accessible: 1200,
-    inaccessible: 300,
-    loginForms: 800,
-    parked: 150,
-    previouslyBreached: 400,
-  },
-  vulnerabilityRadar: [
-    { category: "Unresolved Issues", value: 900, fullMark: 1500 },
-    { category: "Login Forms", value: 800, fullMark: 1500 },
-    { category: "Previously Breached", value: 400, fullMark: 1500 },
-    { category: "Active Sites", value: 1200, fullMark: 1500 },
-    { category: "Critical Services", value: 600, fullMark: 1500 },
-    { category: "High-Risk Domains", value: 450, fullMark: 1500 },
-  ],
-  loginFormDistribution: {
-    basic: 400,
-    captcha: 200,
-    otp: 150,
-    other: 50,
-  },
-  timelineData: [
-    { date: "2024-01", newBreaches: 120, resolved: 80 },
-    { date: "2024-02", newBreaches: 150, resolved: 100 },
-    { date: "2024-03", newBreaches: 90, resolved: 130 },
-    { date: "2024-04", newBreaches: 200, resolved: 150 },
-  ],
-  topApplications: [
-    { name: "WordPress", count: 300 },
-    { name: "Citrix", count: 200 },
-    { name: "Exchange", count: 150 },
-    { name: "SharePoint", count: 100 },
-    { name: "Custom", count: 250 },
-  ],
+// Helper functions for mock data generation
+const generateHistoricalData = (
+  total: number,
+  resolved: number
+): HistoricalImpactData[] => {
+  const months = 6;
+  return Array.from({ length: months }, (_, i) => {
+    const date = new Date();
+    date.setMonth(date.getMonth() - (months - i - 1));
+    return {
+      date: date.toISOString().slice(0, 7),
+      accountsAffected: Math.round(total * (0.7 + Math.random() * 0.3)),
+      criticalSystems: Math.round(resolved * (0.7 + Math.random() * 0.3)),
+      recoveryTime: Math.round(48 * (0.8 + Math.random() * 0.4)),
+    };
+  });
 };
 
-const BreachMetricsDashboard: React.FC<BreachMetricsDashboardProps> = ({
-  apiEndpoint = "/api/statistics",
-  onDataUpdate,
-}) => {
-  const [data, setData] = useState<DashboardData>(mockData);
+const generateAuthData = (
+  historicalData: HistoricalImpactData[]
+): AuthPatternData[] => {
+  return historicalData.map((item) => ({
+    date: item.date,
+    attempts: Math.round(item.accountsAffected * 1.5),
+    successRate: Math.round(60 + Math.random() * 30),
+  }));
+};
+
+// Mock data for development and fallback
+const mockMetrics: SecurityMetrics = {
+  total: 1500,
+  resolved: 600,
+  unresolved: 900,
+  accessible: 1200,
+  inaccessible: 300,
+  loginForms: 800,
+  parked: 150,
+  previouslyBreached: 400,
+};
+
+const calculateRiskSeverity = (total: number): RiskSeverityData[] => [
+  { name: "Critical", count: Math.round(total * 0.2) },
+  { name: "High", count: Math.round(total * 0.3) },
+  { name: "Medium", count: Math.round(total * 0.3) },
+  { name: "Low", count: Math.round(total * 0.2) },
+];
+
+const calculateResolutionStatus = (
+  resolved: number,
+  unresolved: number
+): BreachResolutionData[] => [
+  { category: "Resolved", count: resolved },
+  { category: "In Progress", count: Math.floor(unresolved * 0.4) },
+  { category: "Pending", count: Math.floor(unresolved * 0.3) },
+  { category: "Requires Attention", count: Math.floor(unresolved * 0.3) },
+];
+
+const BreachMetricsDashboard: React.FC = () => {
+  const [metrics, setMetrics] = useState<SecurityMetrics>(mockMetrics);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
+  const [isMockData, setIsMockData] = useState<boolean>(true);
+
+  // Derived state for charts
+  const [riskData, setRiskData] = useState<RiskSeverityData[]>(
+    calculateRiskSeverity(mockMetrics.total)
+  );
+  const [resolutionData, setResolutionData] = useState<BreachResolutionData[]>(
+    calculateResolutionStatus(mockMetrics.resolved, mockMetrics.unresolved)
+  );
+  const [historicalData, setHistoricalData] = useState<HistoricalImpactData[]>(
+    generateHistoricalData(mockMetrics.total, mockMetrics.resolved)
+  );
+  const [authData, setAuthData] = useState<AuthPatternData[]>(
+    generateAuthData(
+      generateHistoricalData(mockMetrics.total, mockMetrics.resolved)
+    )
+  );
 
   const fetchData = useCallback(async () => {
     try {
       setIsRefreshing(true);
       setError(null);
 
-      const response = await axios.get(apiEndpoint);
+      const response = await axios.get<APIStatisticsResponse>(
+        "/api/statistics"
+      );
 
       if (response.status === 200) {
-        const statisticsData = response.data;
+        const data = response.data;
+        setIsMockData(false);
 
-        const updatedData: DashboardData = {
-          securityMetrics: {
-            total: statisticsData.total_records,
-            resolved: statisticsData.resolved_cases,
-            unresolved:
-              statisticsData.total_records - statisticsData.resolved_cases,
-            accessible: statisticsData.accessible_domains,
-            inaccessible:
-              statisticsData.total_records -
-              statisticsData.accessible_domains,
-            loginForms: statisticsData.login_forms,
-            parked: 0,
-            previouslyBreached: 0,
-          },
-          vulnerabilityRadar: mockData.vulnerabilityRadar,
-          loginFormDistribution:
-            statisticsData.login_form_types || mockData.loginFormDistribution,
-          timelineData: mockData.timelineData,
-          topApplications: mockData.topApplications,
+        // Transform API data into our metrics format
+        const securityMetrics: SecurityMetrics = {
+          total: data.total_records,
+          resolved: data.resolved_cases,
+          unresolved: data.total_records - data.resolved_cases,
+          accessible: data.accessible_domains,
+          inaccessible: data.total_records - data.accessible_domains,
+          loginForms: data.login_forms,
+          parked: data.is_parked,
+          previouslyBreached: data.previously_breached,
         };
 
-        setData(updatedData);
-        onDataUpdate?.(updatedData);
-      } else {
-        throw new Error("Failed to fetch dashboard data");
+        // Update all metrics and chart data
+        setMetrics(securityMetrics);
+        setRiskData(calculateRiskSeverity(data.total_records));
+        setResolutionData(
+          calculateResolutionStatus(
+            data.resolved_cases,
+            data.total_records - data.resolved_cases
+          )
+        );
+
+        // Generate historical data based on actual metrics
+        const historical = generateHistoricalData(
+          data.total_records,
+          data.resolved_cases
+        );
+        setHistoricalData(historical);
+
+        // Generate authentication data based on historical data
+        setAuthData(generateAuthData(historical));
       }
     } catch (err) {
       console.error("Error fetching dashboard data:", err);
-      setError("Failed to fetch dashboard data. Using mock data instead.");
-      setData(mockData);
-      onDataUpdate?.(mockData);
+      setError("Failed to fetch dashboard data. Using mock data.");
+      setIsMockData(true);
+
+      // Use mock data as fallback
+      setMetrics(mockMetrics);
+      setRiskData(calculateRiskSeverity(mockMetrics.total));
+      setResolutionData(
+        calculateResolutionStatus(mockMetrics.resolved, mockMetrics.unresolved)
+      );
+
+      // Generate mock historical and auth data
+      const mockHistorical = generateHistoricalData(
+        mockMetrics.total,
+        mockMetrics.resolved
+      );
+      setHistoricalData(mockHistorical);
+      setAuthData(generateAuthData(mockHistorical));
     } finally {
       setLoading(false);
       setIsRefreshing(false);
     }
-  }, [apiEndpoint, onDataUpdate]);
+  }, []);
 
-  // Initial data fetch
-  React.useEffect(() => {
+  useEffect(() => {
     fetchData();
   }, [fetchData]);
-
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center h-96">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900" />
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-6">
@@ -135,8 +188,10 @@ const BreachMetricsDashboard: React.FC<BreachMetricsDashboardProps> = ({
           disabled={isRefreshing}
           className="flex items-center gap-2"
         >
-          <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
-          {isRefreshing ? 'Refreshing...' : 'Refresh Data'}
+          <RefreshCw
+            className={`h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`}
+          />
+          {isRefreshing ? "Refreshing..." : "Refresh Data"}
         </Button>
       </div>
 
@@ -146,21 +201,52 @@ const BreachMetricsDashboard: React.FC<BreachMetricsDashboardProps> = ({
         </Alert>
       )}
 
-      {/* Search Section */}
+      {/* Advanced Search */}
       <AdvancedSearch />
 
-      {/* Summary Cards */}
-      <SummaryCards metrics={data.securityMetrics} />
+      {loading ? (
+        <div className="flex justify-center items-center h-96">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900" />
+        </div>
+      ) : (
+        <>
+          {/* Summary Cards */}
+          <SummaryCards metrics={metrics} />
 
-      {/* Main Charts Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <SecurityRadarChart data={data.vulnerabilityRadar} />
-        <TimelineChart data={data.timelineData} />
-        <DistributionCharts
-          loginFormData={data.loginFormDistribution}
-          applicationData={data.topApplications}
-        />
-      </div>
+          {/* Main Charts Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <RiskSeverityChart data={riskData} />
+            <BreachResolutionChart data={resolutionData} />
+            <HistoricalImpactChart data={historicalData} />
+            <AuthSuccessChart data={authData} />
+            <SecurityRadarChart data={metrics} />
+            <TimelineChart data={historicalData} />
+            <div className="col-span-2">
+              <DistributionCharts
+                loginFormData={{
+                  basic: metrics.loginForms * 0.4,
+                  captcha: metrics.loginForms * 0.3,
+                  otp: metrics.loginForms * 0.2,
+                  other: metrics.loginForms * 0.1,
+                }}
+                applicationData={[
+                  {
+                    name: "WordPress",
+                    count: Math.round(metrics.total * 0.25),
+                  },
+                  { name: "Citrix", count: Math.round(metrics.total * 0.2) },
+                  { name: "Exchange", count: Math.round(metrics.total * 0.15) },
+                  {
+                    name: "SharePoint",
+                    count: Math.round(metrics.total * 0.1),
+                  },
+                  { name: "Custom", count: Math.round(metrics.total * 0.3) },
+                ]}
+              />
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 };

@@ -80,9 +80,9 @@ const IPRangeExclusion: React.FC<IPRangeExclusionProps> = ({ onRangesChange }) =
   };
 
   return (
-    <Card className="w-full">
+    <Card className="w-full bg-gray-800 border-blue-500/30">
       <CardHeader className="pb-3">
-        <CardTitle className="text-sm font-medium">
+        <CardTitle className="text-sm font-medium text-blue-400">
           Excluded IP Ranges
         </CardTitle>
       </CardHeader>
@@ -98,14 +98,14 @@ const IPRangeExclusion: React.FC<IPRangeExclusionProps> = ({ onRangesChange }) =
                 }}
                 onKeyPress={handleKeyPress}
                 placeholder="Add IP range (e.g., 192.168.0.0/16)"
-                className={error ? 'border-red-500' : ''}
+                className={`bg-gray-700 text-gray-300 ${error ? 'border-red-500' : 'border-gray-600 focus:ring-blue-500'}`}
               />
             </div>
             <Button
               onClick={addRange}
               variant="secondary"
               size="icon"
-              className="shrink-0"
+              className="shrink-0 bg-blue-500/10 text-blue-400 hover:bg-blue-500/20"
             >
               <Plus className="h-4 w-4" />
             </Button>
@@ -113,8 +113,8 @@ const IPRangeExclusion: React.FC<IPRangeExclusionProps> = ({ onRangesChange }) =
 
           {error && (
             <Alert variant="destructive">
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription>{error}</AlertDescription>
+              <AlertCircle className="h-4 w-4 text-red-400" />
+              <AlertDescription className="text-red-400">{error}</AlertDescription>
             </Alert>
           )}
 
@@ -123,7 +123,7 @@ const IPRangeExclusion: React.FC<IPRangeExclusionProps> = ({ onRangesChange }) =
               <Badge
                 key={range}
                 variant="secondary"
-                className="flex items-center gap-1 text-xs"
+                className="flex items-center gap-1 text-xs text-blue-400 bg-blue-500/10"
               >
                 {range}
                 <X

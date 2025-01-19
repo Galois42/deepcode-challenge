@@ -1,5 +1,21 @@
-// src/types/dashboard.ts
+// Base API Response Types
+export interface APIStatisticsResponse {
+  total_records: number;
+  accessible_domains: number;
+  unique_domains: number;
+  login_forms: number;
+  resolved_cases: number;
+  is_parked: number;
+  previously_breached: number;
+  login_form_types: {
+    basic?: number;
+    captcha?: number;
+    otp?: number;
+    other?: number;
+  };
+}
 
+// Core Metrics
 export interface SecurityMetrics {
   total: number;
   resolved: number;
@@ -9,6 +25,30 @@ export interface SecurityMetrics {
   loginForms: number;
   parked: number;
   previouslyBreached: number;
+}
+
+// Chart-specific Types
+export interface RiskSeverityData {
+  name: string;  // 'Critical' | 'High' | 'Medium' | 'Low'
+  count: number;
+}
+
+export interface BreachResolutionData {
+  category: string;  // 'Resolved' | 'In Progress' | 'Pending' | 'Requires Attention'
+  count: number;
+}
+
+export interface HistoricalImpactData {
+  date: string;
+  accountsAffected: number;
+  criticalSystems: number;
+  recoveryTime: number;
+}
+
+export interface AuthPatternData {
+  date: string;
+  attempts: number;
+  successRate: number;
 }
 
 export interface VulnerabilityRadarData {
@@ -35,55 +75,71 @@ export interface TopApplication {
   count: number;
 }
 
-export interface DashboardData {
-  securityMetrics: SecurityMetrics;
-  vulnerabilityRadar: VulnerabilityRadarData[];
-  loginFormDistribution: LoginFormDistribution;
-  timelineData: TimelineData[];
-  topApplications: TopApplication[];
-}
-
-// Extra types needed for the dashboard components
-export interface CategoryData {
-  name: string;
-  value: number;
-}
-
+// High Risk Domain Types
 export interface HighRiskDomain {
-  name: string;
+  domain: string;
   riskScore: number;
-  breachCount?: number;
-  lastBreachDate?: string;
-  tags?: string[];
+  breachCount: number;
+  lastBreachDate: string;
+  tags: string[];
+  applicationTypes: string[];
+  vulnerabilities: string[];
 }
 
+// Search Analytics Types
 export interface SearchTrendData {
-  hour: number;
-  day: string;
-  value: number;
+  timestamp: string;
+  query: string;
+  resultCount: number;
+  filters: {
+    domain?: string;
+    ip?: string;
+    application?: string;
+    status?: string;
+  };
 }
 
-export interface DailySearchData {
-  [hour: number]: number;
-}
-
-export interface WeeklySearchData {
-  [day: string]: DailySearchData;
-}
-
+// Component Props Types
 export interface BreachCategoryProps {
   data: {
     loginFormDistribution: LoginFormDistribution;
     loginFormTypes?: {
-      other: number;
+      basic?: number;
+      captcha?: number;
+      otp?: number;
+      other?: number;
     };
   };
 }
 
 export interface HighRiskDomainsProps {
   domains: HighRiskDomain[];
+  onDomainClick?: (domain: HighRiskDomain) => void;
 }
 
 export interface SearchTrendsProps {
-  data: WeeklySearchData;
+  data: SearchTrendData[];
+  onTimeRangeChange?: (range: string) => void;
+}
+
+// Aggregated Dashboard Data
+export interface DashboardData {
+  securityMetrics: SecurityMetrics;
+  riskSeverity: RiskSeverityData[];
+  breachResolution: BreachResolutionData[];
+  historicalImpact: HistoricalImpactData[];
+  authPatterns: AuthPatternData[];
+  vulnerabilityRadar: VulnerabilityRadarData[];
+  loginFormDistribution: LoginFormDistribution;
+  timelineData: TimelineData[];
+  topApplications: TopApplication[];
+  highRiskDomains: HighRiskDomain[];
+  searchTrends: SearchTrendData[];
+}
+
+// Chart Component Props
+export interface ChartProps<T> {
+  data: T[];
+  className?: string;
+  onDataPointClick?: (data: T) => void;
 }
