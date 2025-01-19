@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Search, X, Filter, Loader2 } from 'lucide-react';
 import _ from 'lodash';
 import {
@@ -27,6 +27,7 @@ import {
 import IPRangeExclusion from './IPRangeExclusion';
 import axios from 'axios';
 
+// Types and interfaces
 type LoginFormType = 'basic' | 'captcha' | 'otp' | 'other';
 type FilterType = 'domain' | 'ip' | 'port' | 'path' | 'application' | 'login_type' | 'status' | 'tag';
 
@@ -45,7 +46,7 @@ interface SearchResult {
   ip_address: string | null;
   port: number | null;
   path: string | null;
-  tags: Record<string, string>;
+  tags: string[];
   title: string | null;
   is_resolved: boolean;
   is_accessible: boolean;
@@ -57,6 +58,20 @@ interface SearchResult {
   created_at: string;
 }
 
+interface SearchParams {
+  q?: string;
+  domain?: string;
+  ip?: string;
+  port?: string;
+  path?: string;
+  application?: string;
+  login_type?: string;
+  status?: string;
+  tag?: string;
+  excludedIpRanges?: string[];
+}
+
+// Filter options
 const filterOptions = {
   status: [
     { value: 'unresolved', label: 'Unresolved' },
@@ -81,43 +96,147 @@ const filterOptions = {
   ]
 };
 
+// Mock data
+const mockResults: SearchResult[] = [
+  {
+    id: 1,
+    uri: 'https://example.com/login',
+    username: 'admin',
+    password: 'redacted',
+    domain: 'example.com',
+    ip_address: '192.168.1.1',
+    port: 443,
+    path: '/login',
+    tags: ['critical', 'unresolved', 'healthcare'],
+    title: 'Admin Login',
+    is_resolved: false,
+    is_accessible: true,
+    has_login_form: true,
+    login_form_type: 'basic',
+    web_application: 'WordPress',
+    is_parked: false,
+    is_breached: true,
+    created_at: '2024-01-18T10:00:00Z'
+  },
+  {
+    id: 2,
+    uri: 'https://test.example.org/admin',
+    username: 'user',
+    password: 'redacted',
+    domain: 'test.example.org',
+    ip_address: '10.0.0.1',
+    port: 8080,
+    path: '/admin',
+    tags: ['medium', 'resolved', 'internal'],
+    title: 'User Portal',
+    is_resolved: true,
+    is_accessible: true,
+    has_login_form: true,
+    login_form_type: 'captcha',
+    web_application: 'Custom',
+    is_parked: false,
+    is_breached: false,
+    created_at: '2024-01-17T15:30:00Z'
+  }
+];
+
 const AdvancedSearch = () => {
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState<string>('');
   const [activeFilters, setActiveFilters] = useState<SearchFilter[]>([]);
   const [results, setResults] = useState<SearchResult[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [excludedIpRanges, setExcludedIpRanges] = useState<string[]>([]);
-  const [totalResults, setTotalResults] = useState(0);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
+  const [error, setError] = useState<string | null>(null);
+  const [isMockData, setIsMockData] = useState<boolean>(false);
 
-  const fetchData = useCallback(async () => {
+  const fetchData = useCallback(async (
+    query: string,
+    filters: SearchFilter[],
+    ipRanges: string[]
+  ) => {
     setIsLoading(true);
+    setError(null);
+    setIsMockData(false);
+
     try {
-      const params = {
-        q: searchQuery,
-        page: currentPage,
-        per_page: 50,
-        ...activeFilters.reduce((acc: Record<FilterType, string>, filter: SearchFilter) => {
-          acc[filter.type] = filter.value;
-          return acc;
-        }, {} as Record<FilterType, string>),
+      const params: SearchParams = {
+        q: query,
+        excludedIpRanges: ipRanges
       };
-  
+
+      // Transform filters into params
+      filters.forEach(filter => {
+        params[filter.type] = filter.value;
+      });
+
+      // Attempt to fetch from API
       const response = await axios.get('/api/search', { params });
       setResults(response.data.results);
-      setTotalResults(response.data.total);
-      setTotalPages(response.data.pages);
+      
     } catch (error) {
       console.error('Search error:', error);
+      setError('Failed to fetch search results. Falling back to mock data.');
+      
+      // Filter mock data based on search params
+      const filteredResults = mockResults.filter(result => {
+        // Basic search query filter
+        if (query && !Object.values(result).some(value => 
+          String(value).toLowerCase().includes(query.toLowerCase())
+        )) {
+          return false;
+        }
+        
+        // IP range exclusion filter
+        if (result.ip_address && ipRanges.some(range => 
+          result.ip_address?.startsWith(range)
+        )) {
+          return false;
+        }
+        
+        // Filter based on active filters
+        return filters.every(filter => {
+          switch (filter.type) {
+            case 'application':
+              return result.web_application?.toLowerCase() === filter.value.toLowerCase();
+            case 'login_type':
+              return result.login_form_type === filter.value;
+            case 'status':
+              switch (filter.value) {
+                case 'unresolved':
+                  return !result.is_resolved;
+                case 'accessible':
+                  return result.is_accessible;
+                case 'login_form':
+                  return result.has_login_form;
+                case 'parked':
+                  return result.is_parked;
+                case 'breached':
+                  return result.is_breached;
+                default:
+                  return true;
+              }
+            case 'tag':
+              return result.tags.includes(filter.value);
+            default:
+              return true;
+          }
+        });
+      });
+      
+      setResults(filteredResults);
+      setIsMockData(true);
     } finally {
       setIsLoading(false);
     }
-  }, [searchQuery, activeFilters, currentPage]);
+  }, []);
 
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+  // Debounced search function
+  const debouncedFetchData = useCallback(
+    _.debounce((query: string, filters: SearchFilter[], ipRanges: string[]) => {
+      fetchData(query, filters, ipRanges);
+    }, 300),
+    [fetchData]
+  );
 
   const addFilter = (type: FilterType, value: string) => {
     const newFilter = {
@@ -127,28 +246,24 @@ const AdvancedSearch = () => {
     };
     const updatedFilters = [...activeFilters, newFilter];
     setActiveFilters(updatedFilters);
-    setCurrentPage(1);
-    fetchData();
+    debouncedFetchData(searchQuery, updatedFilters, excludedIpRanges);
   };
 
   const removeFilter = (filterId: string) => {
     const updatedFilters = activeFilters.filter(f => f.id !== filterId);
     setActiveFilters(updatedFilters);
-    setCurrentPage(1);
-    fetchData();
+    debouncedFetchData(searchQuery, updatedFilters, excludedIpRanges);
   };
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newQuery = e.target.value;
     setSearchQuery(newQuery);
-    setCurrentPage(1);
-    fetchData();
+    debouncedFetchData(newQuery, activeFilters, excludedIpRanges);
   };
 
   const handleIpRangeExclusion = (ranges: string[]) => {
     setExcludedIpRanges(ranges);
-    setCurrentPage(1);
-    fetchData();
+    debouncedFetchData(searchQuery, activeFilters, ranges);
   };
 
   return (
@@ -184,12 +299,16 @@ const AdvancedSearch = () => {
                   <div>
                     <h3 className="text-sm font-medium mb-2">Application Type</h3>
                     <Select onValueChange={(value) => addFilter('application', value)}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select application" />
+                      <SelectTrigger className="bg-white text-gray-900 w-full">
+                        <SelectValue className="text-gray-900" placeholder="Select application" />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="bg-white">
                         {filterOptions.application.map(option => (
-                          <SelectItem key={option.value} value={option.value}>
+                          <SelectItem 
+                            key={option.value} 
+                            value={option.value}
+                            className="hover:bg-gray-100"
+                          >
                             {option.label}
                           </SelectItem>
                         ))}
@@ -199,12 +318,16 @@ const AdvancedSearch = () => {
                   <div>
                     <h3 className="text-sm font-medium mb-2">Login Type</h3>
                     <Select onValueChange={(value) => addFilter('login_type', value)}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select login type" />
+                      <SelectTrigger className="bg-white text-gray-900 w-full">
+                        <SelectValue className="text-gray-900" placeholder="Select login type" />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="bg-white">
                         {filterOptions.loginType.map(option => (
-                          <SelectItem key={option.value} value={option.value}>
+                          <SelectItem 
+                            key={option.value} 
+                            value={option.value}
+                            className="hover:bg-gray-100"
+                          >
                             {option.label}
                           </SelectItem>
                         ))}
@@ -214,12 +337,16 @@ const AdvancedSearch = () => {
                   <div>
                     <h3 className="text-sm font-medium mb-2">Status</h3>
                     <Select onValueChange={(value) => addFilter('status', value)}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select status" />
+                      <SelectTrigger className="bg-white text-gray-900 w-full">
+                        <SelectValue className="text-gray-900" placeholder="Select status" />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="bg-white">
                         {filterOptions.status.map(option => (
-                          <SelectItem key={option.value} value={option.value}>
+                          <SelectItem 
+                            key={option.value} 
+                            value={option.value}
+                            className="hover:bg-gray-100"
+                          >
                             {option.label}
                           </SelectItem>
                         ))}
@@ -264,6 +391,14 @@ const AdvancedSearch = () => {
             </div>
           ) : (
             <>
+              {error && (
+                <div className="text-red-500 mb-4">{error}</div>
+              )}
+              {isMockData && (
+                <div className="text-yellow-600 mb-4">
+                  Showing mock data for demonstration purposes
+                </div>
+              )}
               <div className="overflow-hidden rounded-md border">
                 <table className="w-full">
                   <thead className="bg-gray-50">
@@ -301,14 +436,14 @@ const AdvancedSearch = () => {
                         </td>
                         <td className="px-4 py-3">
                           <div className="flex flex-wrap gap-1">
-                            {result.tags && Object.entries(result.tags).map(([key, value]) => (
+                            {result.tags.map((tag, idx) => (
                               <Badge
-                                key={key}
+                                key={idx}
                                 variant="outline"
                                 className="cursor-pointer hover:bg-gray-100"
-                                onClick={() => addFilter('tag', `${key}:${value}`)}
+                                onClick={() => addFilter('tag', tag)}
                               >
-                                {key}: {value}
+                                {tag}
                               </Badge>
                             ))}
                           </div>
@@ -326,15 +461,6 @@ const AdvancedSearch = () => {
                   </div>
                 )}
               </div>
-              {totalResults > 0 && (
-                <div className="mt-4 flex justify-between">
-                  <div className="text-sm text-gray-700">
-                    Showing {(currentPage - 1) * 50 + 1} to{' '}
-                    {Math.min(currentPage * 50, totalResults)} of {totalResults} results
-                  </div>
-                  {/* Add pagination controls */}
-                </div>
-              )}
             </>
           )}
         </div>

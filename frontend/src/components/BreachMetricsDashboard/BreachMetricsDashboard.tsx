@@ -1,16 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import SummaryCards from './SummaryCards';
-import SecurityRadarChart from './SecurityRadarChart';
-import TimelineChart from './TimelineChart';
-import DistributionCharts from './DistributionCharts';
-import type { DashboardData } from '@/types/dashboard';
-import AdvancedSearch from './AdvancedSearch';
+import React, { useState, useCallback } from "react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { RefreshCw } from "lucide-react";
+import SummaryCards from "./SummaryCards";
+import SecurityRadarChart from "./SecurityRadarChart";
+import TimelineChart from "./TimelineChart";
+import DistributionCharts from "./DistributionCharts";
+import type { DashboardData } from "@/types/dashboard";
+import AdvancedSearch from "./AdvancedSearch";
+import axios from "axios";
 
 interface BreachMetricsDashboardProps {
-  data?: DashboardData;
   apiEndpoint?: string;
-  refreshInterval?: number;
   onDataUpdate?: (data: DashboardData) => void;
 }
 
@@ -26,12 +27,12 @@ const mockData: DashboardData = {
     previouslyBreached: 400,
   },
   vulnerabilityRadar: [
-    { category: 'Unresolved Issues', value: 900, fullMark: 1500 },
-    { category: 'Login Forms', value: 800, fullMark: 1500 },
-    { category: 'Previously Breached', value: 400, fullMark: 1500 },
-    { category: 'Active Sites', value: 1200, fullMark: 1500 },
-    { category: 'Critical Services', value: 600, fullMark: 1500 },
-    { category: 'High-Risk Domains', value: 450, fullMark: 1500 },
+    { category: "Unresolved Issues", value: 900, fullMark: 1500 },
+    { category: "Login Forms", value: 800, fullMark: 1500 },
+    { category: "Previously Breached", value: 400, fullMark: 1500 },
+    { category: "Active Sites", value: 1200, fullMark: 1500 },
+    { category: "Critical Services", value: 600, fullMark: 1500 },
+    { category: "High-Risk Domains", value: 450, fullMark: 1500 },
   ],
   loginFormDistribution: {
     basic: 400,
@@ -40,73 +41,82 @@ const mockData: DashboardData = {
     other: 50,
   },
   timelineData: [
-    { date: '2024-01', newBreaches: 120, resolved: 80 },
-    { date: '2024-02', newBreaches: 150, resolved: 100 },
-    { date: '2024-03', newBreaches: 90, resolved: 130 },
-    { date: '2024-04', newBreaches: 200, resolved: 150 },
+    { date: "2024-01", newBreaches: 120, resolved: 80 },
+    { date: "2024-02", newBreaches: 150, resolved: 100 },
+    { date: "2024-03", newBreaches: 90, resolved: 130 },
+    { date: "2024-04", newBreaches: 200, resolved: 150 },
   ],
   topApplications: [
-    { name: 'WordPress', count: 300 },
-    { name: 'Citrix', count: 200 },
-    { name: 'Exchange', count: 150 },
-    { name: 'SharePoint', count: 100 },
-    { name: 'Custom', count: 250 },
+    { name: "WordPress", count: 300 },
+    { name: "Citrix", count: 200 },
+    { name: "Exchange", count: 150 },
+    { name: "SharePoint", count: 100 },
+    { name: "Custom", count: 250 },
   ],
 };
 
 const BreachMetricsDashboard: React.FC<BreachMetricsDashboardProps> = ({
-  data: propData,
-  apiEndpoint,
-  refreshInterval = 30000,
+  apiEndpoint = "/api/statistics",
   onDataUpdate,
 }) => {
-  const [data, setData] = useState<DashboardData | null>(null);
+  const [data, setData] = useState<DashboardData>(mockData);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
 
-  useEffect(() => {
-    if (propData) {
-      setData(propData);
-      setLoading(false);
-      onDataUpdate?.(propData);
-      return;
-    }
+  const fetchData = useCallback(async () => {
+    try {
+      setIsRefreshing(true);
+      setError(null);
 
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        setError(null);
+      const response = await axios.get(apiEndpoint);
 
-        if (apiEndpoint) {
-          const response = await fetch(apiEndpoint);
-          if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-          }
-          const newData = await response.json();
-          setData(newData);
-          onDataUpdate?.(newData);
-        } else {
-          // Use mock data
-          setData(mockData);
-          onDataUpdate?.(mockData);
-        }
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'An error occurred');
-        setData(mockData);
-      } finally {
-        setLoading(false);
+      if (response.status === 200) {
+        const statisticsData = response.data;
+
+        const updatedData: DashboardData = {
+          securityMetrics: {
+            total: statisticsData.total_records,
+            resolved: statisticsData.resolved_cases,
+            unresolved:
+              statisticsData.total_records - statisticsData.resolved_cases,
+            accessible: statisticsData.accessible_domains,
+            inaccessible:
+              statisticsData.total_records -
+              statisticsData.accessible_domains,
+            loginForms: statisticsData.login_forms,
+            parked: 0,
+            previouslyBreached: 0,
+          },
+          vulnerabilityRadar: mockData.vulnerabilityRadar,
+          loginFormDistribution:
+            statisticsData.login_form_types || mockData.loginFormDistribution,
+          timelineData: mockData.timelineData,
+          topApplications: mockData.topApplications,
+        };
+
+        setData(updatedData);
+        onDataUpdate?.(updatedData);
+      } else {
+        throw new Error("Failed to fetch dashboard data");
       }
-    };
-
-    fetchData();
-
-    if (apiEndpoint && refreshInterval > 0) {
-      const interval = setInterval(fetchData, refreshInterval);
-      return () => clearInterval(interval);
+    } catch (err) {
+      console.error("Error fetching dashboard data:", err);
+      setError("Failed to fetch dashboard data. Using mock data instead.");
+      setData(mockData);
+      onDataUpdate?.(mockData);
+    } finally {
+      setLoading(false);
+      setIsRefreshing(false);
     }
-  }, [propData, apiEndpoint, refreshInterval, onDataUpdate]);
+  }, [apiEndpoint, onDataUpdate]);
 
-  if (loading || !data) {
+  // Initial data fetch
+  React.useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  if (loading) {
     return (
       <div className="flex justify-center items-center h-96">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900" />
@@ -114,16 +124,28 @@ const BreachMetricsDashboard: React.FC<BreachMetricsDashboardProps> = ({
     );
   }
 
-  if (error) {
-    return (
-      <Alert variant="destructive">
-        <AlertDescription>Error loading dashboard data: {error}</AlertDescription>
-      </Alert>
-    );
-  }
-
   return (
     <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h1 className="text-2xl font-bold">Security Dashboard</h1>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={fetchData}
+          disabled={isRefreshing}
+          className="flex items-center gap-2"
+        >
+          <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+          {isRefreshing ? 'Refreshing...' : 'Refresh Data'}
+        </Button>
+      </div>
+
+      {error && (
+        <Alert variant="destructive">
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
+
       {/* Search Section */}
       <AdvancedSearch />
 
@@ -134,7 +156,7 @@ const BreachMetricsDashboard: React.FC<BreachMetricsDashboardProps> = ({
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <SecurityRadarChart data={data.vulnerabilityRadar} />
         <TimelineChart data={data.timelineData} />
-        <DistributionCharts 
+        <DistributionCharts
           loginFormData={data.loginFormDistribution}
           applicationData={data.topApplications}
         />
