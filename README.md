@@ -84,7 +84,7 @@ Building BreachLens involved overcoming several challenges:
 
 ## Accomplishments that we're proud of
 
-🏆 **Honorable Mention Winner** at UottaHack 7 DeepCode Challenge
+* 🏆 **Honorable Mention Winner** at UottaHack 7 DeepCode Challenge
 * Successful implementation of end-to-end automation
 * Development of a scalable framework for large datasets
 * Creation of practical utility for enhancing cybersecurity
