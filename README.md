@@ -100,20 +100,6 @@ This project deepened our understanding of:
 * Complex workflow design
 * Real-time data processing
 
-## What's next for BreachLens
-
-### Future Developments
-* Integration with SIEM Tools
-* Enhanced tagging capabilities
-* Real-time visualization dashboards
-* Community contribution platform
-
-### Planned Features
-* Advanced analytics dashboard
-* Machine learning integration
-* Extended API capabilities
-* Enhanced reporting features
-
 ## Built With
 * Python
 * Flask
@@ -121,10 +107,3 @@ This project deepened our understanding of:
 * asyncio
 * aiohttp
 * Socket.io
-
-## Getting Started
-
-### Prerequisites
-* Python 3.8+
-* MySQL 8.0+
-* Virtual environment (recommended)
