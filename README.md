@@ -8,6 +8,8 @@
 
 BreachLens is an advanced automated breach data analysis platform that helps organizations identify, categorize, and respond to data breaches efficiently. By leveraging automation and data intelligence, BreachLens provides actionable insights to enhance cybersecurity posture.
 
+🏆 **Honorable Mention Winner** at UottaHack 7 DeepCode Challenge
+
 ## Inspiration
 
 The increasing frequency of data breaches has created a pressing need for efficient and scalable tools to analyze compromised data. Inspired by the challenges cybersecurity professionals face in identifying, categorizing, and responding to breaches, we set out to create a solution that leverages automation and data intelligence. Our goal was to provide a streamlined platform that not only detects vulnerabilities but also generates actionable insights for organizations to enhance their security posture.
@@ -82,6 +84,7 @@ Building BreachLens involved overcoming several challenges:
 
 ## Accomplishments that we're proud of
 
+🏆 **Honorable Mention Winner** at UottaHack 7 DeepCode Challenge
 * Successful implementation of end-to-end automation
 * Development of a scalable framework for large datasets
 * Creation of practical utility for enhancing cybersecurity
