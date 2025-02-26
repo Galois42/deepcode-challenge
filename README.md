@@ -1,90 +1,90 @@
-# BreachLens
+# BreachLens 🔍
 
 [![Python Version](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![Flask Version](https://img.shields.io/badge/flask-2.0+-green.svg)](https://flask.palletsprojects.com/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-Watch a demonstration of the project in action! : https://www.youtube.com/watch?v=O7sY7P21RNU&ab_channel=MohammedElhasnaoui
+🎬 Watch a demonstration of the project in action! : https://www.youtube.com/watch?v=O7sY7P21RNU&ab_channel=MohammedElhasnaoui
 
-## Overview
+## 📊 Overview
 
 BreachLens is an advanced automated breach data analysis platform that helps organizations identify, categorize, and respond to data breaches efficiently. By leveraging automation and data intelligence, BreachLens provides actionable insights to enhance cybersecurity posture.
 
 🏆 **Honorable Mention Winner** at UottaHack 7 DeepCode Challenge
 
-## Inspiration
+## 💡 Inspiration
 
 The increasing frequency of data breaches has created a pressing need for efficient and scalable tools to analyze compromised data. Inspired by the challenges cybersecurity professionals face in identifying, categorizing, and responding to breaches, we set out to create a solution that leverages automation and data intelligence. Our goal was to provide a streamlined platform that not only detects vulnerabilities but also generates actionable insights for organizations to enhance their security posture.
 
-## What it does
+## ⚙️ What it does
 
 Our project, BreachLens, simplifies the complex task of analyzing breached account data. Key features include:
 
-* **Automated Data Processing**
+* **🔄 Automated Data Processing**
     * Extracts and categorizes accounts by domains, IPs, applications, and more
     * Process millions of breach entries efficiently
     * Real-time data parsing and analysis
 
-* **Advanced Tagging System**
+* **🏷️ Advanced Tagging System**
     * Tags domains for attributes like security status
     * Accessibility verification
     * Parked domain detection
     * Application type identification
 
-* **Security Analysis**
+* **🔒 Security Analysis**
     * CAPTCHA and login form detection
     * Real-time domain status verification
     * Identification of security vulnerabilities
 
-* **Breach Intelligence**
+* **🕵️ Breach Intelligence**
     * Matches domains against known breached data
     * Historical breach correlation
     * Risk level assessment
 
-## How we built it
+## 🛠️ How we built it
 
 The project combines robust backend processing with cutting-edge libraries and asynchronous programming:
 
-* **Backend**
+* **🖥️ Backend**
     * Python with Flask and asyncio
     * Real-time data parsing and scalability
     * Efficient multithreading processing
 
-* **Tagging Logic**
+* **🧠 Tagging Logic**
     * OWASP guidelines implementation
     * Custom algorithms for vulnerability detection
     * Advanced data classification systems
 
-* **Database**
+* **🗄️ Database**
     * MySQL database for structured storage
     * Optimized for large datasets
     * Efficient data retrieval mechanisms
 
-* **Performance**
+* **⚡ Performance**
     * Multithreaded processing
     * Asynchronous HTTP requests
     * Scalable architecture design
 
-## Challenges we ran into
+## 🧗 Challenges we ran into
 
 Building BreachLens involved overcoming several challenges:
 
-* **Scalability**
+* **📈 Scalability**
     * Ensuring platform handles millions of entries efficiently
     * Optimizing database performance
     * Managing concurrent processing
 
-* **Accuracy**
+* **🎯 Accuracy**
     * Designing robust detection mechanisms
     * Implementing precise domain resolution
     * Accurate security status determination
 
-* **Performance**
+* **⏱️ Performance**
     * Managing real-time processing
     * Optimizing asynchronous HTTP requests
     * Balancing speed with accuracy
 
-## Accomplishments that we're proud of
+## 🏅 Accomplishments that we're proud of
 
 * 🏆 Honorable Mention Winner at UottaHack 7 DeepCode Challenge
 * Successful implementation of end-to-end automation
@@ -92,7 +92,7 @@ Building BreachLens involved overcoming several challenges:
 * Creation of practical utility for enhancing cybersecurity
 * Efficient handling of complex data analysis tasks
 
-## What we learned
+## 📚 What we learned
 
 This project deepened our understanding of:
 
@@ -102,7 +102,7 @@ This project deepened our understanding of:
 * Complex workflow design
 * Real-time data processing
 
-## Built With
+## 🔧 Built With
 * Python
 * Flask
 * MySQL
