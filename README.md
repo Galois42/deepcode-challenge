@@ -4,7 +4,7 @@
 [![Flask Version](https://img.shields.io/badge/flask-2.0+-green.svg)](https://flask.palletsprojects.com/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-Watch a demonstration of the project in action: https://www.youtube.com/watch?v=O7sY7P21RNU&ab_channel=MohammedElhasnaoui
+Watch a demonstration of the project in action! : https://www.youtube.com/watch?v=O7sY7P21RNU&ab_channel=MohammedElhasnaoui
 
 ## Overview
 
