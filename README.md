@@ -4,13 +4,13 @@
 [![Flask Version](https://img.shields.io/badge/flask-2.0+-green.svg)](https://flask.palletsprojects.com/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
+Watch a demonstration of the project in action: https://www.youtube.com/watch?v=O7sY7P21RNU&ab_channel=MohammedElhasnaoui
+
 ## Overview
 
 BreachLens is an advanced automated breach data analysis platform that helps organizations identify, categorize, and respond to data breaches efficiently. By leveraging automation and data intelligence, BreachLens provides actionable insights to enhance cybersecurity posture.
 
 🏆 **Honorable Mention Winner** at UottaHack 7 DeepCode Challenge
-
-Watch a demonstration of our project in action: https://www.youtube.com/watch?v=O7sY7P21RNU&ab_channel=MohammedElhasnaoui
 
 ## Inspiration
 
